@@ -18,8 +18,14 @@ def main():
             elif enter_choice == 1:
                 print(parsing.to_dataframe())
                 ask_for_save(parsing)
+                
             elif enter_choice == 2:
+                custom_starting_page(RequestToSteam, SteamParsing)
+            
+            elif enter_choice == 3:
                 ask_for_trunc(parsing)
+            elif enter_choice == 4:
+                query_table(parsing)
             
         except ValueError:
             print('Invalid input')

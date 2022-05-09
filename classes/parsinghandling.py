@@ -4,6 +4,22 @@ from bs4 import BeautifulSoup
 
 class SimpleQueries:
     
+    def create_table(self):
+        self.c.execute(f'''
+                       CREATE TABLE IF NOT EXISTS {self.tb_name}(
+                           name TEXT,
+                           discount TEXT,
+                           old_price TEXT,
+                           new_price TEXT,
+                           release_date TEXT
+                       )
+                       ''')
+        self.conn.commit()
+    
+    def query(self):
+        return pd.read_sql_query(f'SELECT * FROM {self.tb_name}',
+                                 self.conn)
+    
     def number_of_records(self):
         self.c.execute(f'SELECT * FROM {self.tb_name}')
         return len(self.c.fetchall())
@@ -20,19 +36,7 @@ class SteamParsing(SimpleQueries):
         self.tb_name = tb_name
         self.conn = sqlite3.connect(self.db_name)
         self.c = self.conn.cursor()
-        self.__create_table()
-    
-    def __create_table(self):
-        self.c.execute(f'''
-                       CREATE TABLE IF NOT EXISTS {self.tb_name}(
-                           name TEXT,
-                           discount TEXT,
-                           old_price TEXT,
-                           new_price TEXT,
-                           release_date TEXT
-                       )
-                       ''')
-        self.conn.commit()
+        self.create_table()
     
     def product_names(self):
         return [i.text for i in self.soup.find_all('span', attrs={'class': 'title'})]
