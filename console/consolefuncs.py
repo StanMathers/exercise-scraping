@@ -29,9 +29,6 @@ def custom_starting_page(response_class, parser_class):
             print(par.to_dataframe())
             ask_for_save(par)
             break
-        
-        except ValueError:
-            print('Invalid Value')
         except KeyboardInterrupt:
             break
         except AttributeError:

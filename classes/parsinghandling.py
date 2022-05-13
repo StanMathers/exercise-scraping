@@ -38,28 +38,45 @@ class SteamParsing(SimpleQueries):
         self.c = self.conn.cursor()
         self.create_table()
     
+    def __prevent_errors(self, first, second):
+        if len(first) < len(second):
+            for i in range(len(second) - len(first)):
+                first.append('NaN')
+    
     def product_names(self):
-        return [i.text for i in self.soup.find_all('span', attrs={'class': 'title'})]
+        return [None if len(i) == 0 else i.text for i in self.soup.find_all('span', attrs={'class': 'title'})]
 
     def product_discount(self):
-        return [i.strike.text for i in self.soup.find_all('span', attrs={'style': 'color: #888888;'})]
-    
-    def product_old_price(self):
+        # return [None if len(i) == 0 else i.strike.text for i in self.soup.find_all('span', attrs={'style': 'color: #888888;'})]        
         return [i.span.strike.text for i in self.soup.find_all('div', attrs={'class': 'col search_price discounted responsive_secondrow'})]
     
+    def product_old_price(self):
+        return [None if len(i) == 0 else i.span.strike.text for i in self.soup.find_all('div', attrs={'class': 'col search_price discounted responsive_secondrow'})]
+    
     def product_new_price(self):
-        return [i.br.next_element.strip() for i in self.soup.find_all('div', attrs={'class': 'col search_price discounted responsive_secondrow'})]
+        return [None if len(i) == 0 else i.br.next_element.strip() for i in self.soup.find_all('div', attrs={'class': 'col search_price discounted responsive_secondrow'})]
     
     def product_release_date(self):
-        return [i.text if len(i.text) > 0 else 'N/A' for i in self.soup.find_all('div', attrs={'class': 'col search_released responsive_secondrow'})]
+        return [None if len(i) == 0 else i.text if len(i.text) > 0 else 'N/A' for i in self.soup.find_all('div', attrs={'class': 'col search_released responsive_secondrow'})]
 
     def to_dataframe(self):
+        p_names = self.product_names()
+        p_discount = self.product_discount()
+        p_old_price = self.product_old_price()
+        p_new_price = self.product_new_price()
+        p_release_date = self.product_release_date()
+        
+        self.__prevent_errors(p_discount, p_names)
+        self.__prevent_errors(p_old_price, p_names)
+        self.__prevent_errors(p_new_price, p_names)
+        self.__prevent_errors(p_release_date, p_names)
+        
         consist = {
-            'name': self.product_names(),
-            'discount': self.product_discount(),
-            'old price': self.product_old_price(),
-            'new price': self.product_new_price(),
-            'release date': self.product_release_date()
+            'name': p_names,
+            'discount': p_discount,
+            'old price': p_old_price,
+            'new price': p_new_price,
+            'release date': p_release_date
         }
         df = pd.DataFrame(consist)
         return df
@@ -70,3 +87,4 @@ class SteamParsing(SimpleQueries):
                    self.product_release_date())
         self.c.executemany(f'INSERT INTO {self.tb_name} VALUES (?, ?, ?, ?, ?)', data)
         self.conn.commit()
+    
