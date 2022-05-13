@@ -44,20 +44,19 @@ class SteamParsing(SimpleQueries):
                 first.append('NaN')
     
     def product_names(self):
-        return [None if len(i) == 0 else i.text for i in self.soup.find_all('span', attrs={'class': 'title'})]
+        return [i.text for i in self.soup.find_all('span', attrs={'class': 'title'})]
 
     def product_discount(self):
-        # return [None if len(i) == 0 else i.strike.text for i in self.soup.find_all('span', attrs={'style': 'color: #888888;'})]        
         return [i.span.strike.text for i in self.soup.find_all('div', attrs={'class': 'col search_price discounted responsive_secondrow'})]
     
     def product_old_price(self):
-        return [None if len(i) == 0 else i.span.strike.text for i in self.soup.find_all('div', attrs={'class': 'col search_price discounted responsive_secondrow'})]
+        return [i.span.strike.text for i in self.soup.find_all('div', attrs={'class': 'col search_price discounted responsive_secondrow'})]
     
     def product_new_price(self):
-        return [None if len(i) == 0 else i.br.next_element.strip() for i in self.soup.find_all('div', attrs={'class': 'col search_price discounted responsive_secondrow'})]
+        return [i.br.next_element.strip() for i in self.soup.find_all('div', attrs={'class': 'col search_price discounted responsive_secondrow'})]
     
     def product_release_date(self):
-        return [None if len(i) == 0 else i.text if len(i.text) > 0 else 'N/A' for i in self.soup.find_all('div', attrs={'class': 'col search_released responsive_secondrow'})]
+        return [i.text if len(i.text) > 0 else 'N/A' for i in self.soup.find_all('div', attrs={'class': 'col search_released responsive_secondrow'})]
 
     def to_dataframe(self):
         p_names = self.product_names()
