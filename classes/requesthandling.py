@@ -10,3 +10,5 @@ class RequestToSteam:
     def html_from_json(self):
         return self.response.json()['results_html']
     
+    
+    

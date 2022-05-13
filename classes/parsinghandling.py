@@ -42,7 +42,7 @@ class SteamParsing(SimpleQueries):
         return [i.text for i in self.soup.find_all('span', attrs={'class': 'title'})]
 
     def product_discount(self):
-        return [i.span.text for i in self.soup.find_all('div', attrs={'class': 'col search_discount responsive_secondrow'})]
+        return [i.strike.text for i in self.soup.find_all('span', attrs={'style': 'color: #888888;'})]
     
     def product_old_price(self):
         return [i.span.strike.text for i in self.soup.find_all('div', attrs={'class': 'col search_price discounted responsive_secondrow'})]
